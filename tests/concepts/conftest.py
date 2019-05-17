@@ -5,7 +5,6 @@ from .factories import (
     ConceptFactory,
     ConceptualDatasetFactory,
     PeriodFactory,
-    TopicFactory,
 )
 
 
@@ -16,40 +15,21 @@ def concept_without_label(db):
 
 
 @pytest.fixture
-def analysis_unit(db):
-    """ An analysis unit in the database """
-    return AnalysisUnitFactory(
-        name="some-analysis-unit",
-        label="Some analysis unit",
-        description="This is some analysis unit",
-    )
-
-
-@pytest.fixture
-def conceptual_dataset(db):
-    """ A conceptual dataset in the database """
-    return ConceptualDatasetFactory(
-        name="some-conceptual-dataset",
-        label="Some conceptual dataset",
-        description="This is some conceptualdataset",
-    )
-
-
-@pytest.fixture
-def period(db):
-    """ A period in the database """
-    return PeriodFactory(
-        name="some-period",
-        label="Some period",
-        description="This is some period",
-        definition="2018",
-    )
-
-
-@pytest.fixture
 def period_without_label(db):
     """ A period without a label in the database """
     return PeriodFactory(name="some-period", description="This is some period")
+
+
+@pytest.fixture
+def conceptual_dataset_without_label(db):
+    """ A conceptual_dataset without a label in the database """
+    return ConceptualDatasetFactory(name="some-period", description="This is some period")
+
+
+@pytest.fixture
+def analysis_unit_without_label(db):
+    """ A analysis_unit without a label in the database """
+    return AnalysisUnitFactory(name="some-period", description="This is some period")
 
 
 @pytest.fixture
@@ -114,8 +94,3 @@ def valid_period_data(study):
 def valid_topic_data(study):
     """ A valid input for topic forms and imports """
     return dict(name="some-topic", study=study.pk)
-
-
-@pytest.fixture
-def topic(study):
-    return TopicFactory(name="some-topic", study=study)

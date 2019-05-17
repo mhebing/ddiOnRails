@@ -3,6 +3,7 @@ import pprint
 from collections import OrderedDict
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.core.handlers.wsgi import WSGIRequest
 from django.forms.widgets import HiddenInput
 from django.http import HttpResponse
@@ -24,13 +25,7 @@ def own_basket_only(view):
         if basket.user == request.user:
             return view(request, basket_id, *args, **kwargs)
         else:
-            messages.add_message(
-                request,
-                messages.INFO,
-                "You don't have the user rights to access basket %s." % basket_id,
-            )
-            return redirect("/")
-
+            raise PermissionDenied
     return wrapper
 
 
@@ -257,6 +252,7 @@ def basket_new(request):
     return render(request, "workspace/basket_create.html", context=context)
 
 
+@own_basket_only
 def script_detail(request, basket_id, script_id):
     script = get_object_or_404(Script, pk=script_id)
     if request.method == "POST":
@@ -291,24 +287,28 @@ def script_detail(request, basket_id, script_id):
     return render(request, "workspace/script_detail.html", context=context)
 
 
+@own_basket_only
 def basket_search(request: WSGIRequest, basket_id: int):
     basket = get_object_or_404(Basket, pk=basket_id)
     context = dict(basket=basket, study_id=basket.study_id)
     return render(request, "workspace/angular.html", context=context)
 
 
+@own_basket_only
 def script_raw(request: WSGIRequest, basket_id: int, script_id: int):
     script = get_object_or_404(Script, pk=script_id)
     text = script.get_script_input()["text"]
     return HttpResponse(text, content_type="text/plain")
 
 
+@own_basket_only
 def basket_delete(request: WSGIRequest, basket_id: int):
     basket = get_object_or_404(Basket, pk=basket_id)
     basket.delete()
     return redirect("/workspace/baskets/")
 
 
+@own_basket_only
 def script_delete(request: WSGIRequest, basket_id: int, script_id: int):
     script = get_object_or_404(Script, pk=script_id)
     script.delete()
@@ -320,6 +320,7 @@ def user_delete(request: WSGIRequest):
     return redirect("/workspace/logout/")
 
 
+@own_basket_only
 def script_new_lang(request: WSGIRequest, basket_id: int, generator_name: str):
     basket = get_object_or_404(Basket, pk=basket_id)
     script_count = basket.script_set.count() + 1
@@ -333,6 +334,7 @@ def script_new_lang(request: WSGIRequest, basket_id: int, generator_name: str):
     return redirect(script.get_absolute_url())
 
 
+@own_basket_only
 def script_new(request: WSGIRequest, basket_id: int):
     basket = get_object_or_404(Basket, pk=basket_id)
     script_count = basket.script_set.count() + 1
